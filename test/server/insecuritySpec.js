@@ -29,9 +29,16 @@ describe('insecurity', () => {
     const z85 = require('z85')
 
     it('returns base85-encoded month, year and discount as coupon code', () => {
-      const coupon = insecurity.generateCoupon(20, new Date('1980-01-01'))
-      expect(coupon).to.equal('n<MiifFb4l')
-      expect(z85.decode(coupon).toString()).to.equal('JAN80-20')
+      const couponDate = new Date('1980-01-01T00:00:00');
+      
+      const actualCouponEncoded = insecurity.generateCoupon(20, couponDate);
+      const expectedCouponEncoded = 'n<MiifFb4l';
+
+      const actualCouponDecoded = z85.decode(actualCouponEncoded);
+      const expectedCouponDecoded = 'JAN80-20';
+     
+      expect(actualCouponEncoded).to.equal(expectedCouponEncoded);
+      expect(actualCouponDecoded.toString()).to.equal(expectedCouponDecoded);
     })
 
     it('uses current month and year if not specified', () => {

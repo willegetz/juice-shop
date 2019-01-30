@@ -141,6 +141,7 @@
     "start": "node app",
     "lint": "standard && cd frontend && ng lint && cd ..",
     "test": "cd frontend && ng test --watch=false --source-map=false && cd .. && nyc --report-dir=./build/reports/coverage/server-tests mocha test/server",
+    "testServer": "mocha test/server",
     "frisby": "nyc --report-dir=./build/reports/coverage/api-tests jest --silent --runInBand",
     "preprotractor": "webdriver-manager update --gecko false",
     "protractor": "npm run e2e",
