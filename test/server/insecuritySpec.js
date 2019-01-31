@@ -81,7 +81,8 @@ describe('insecurity', () => {
     })
 
     it('returns discount from valid coupon code', () => {
-      expect(insecurity.discountFromCoupon(insecurity.generateCoupon('05'))).to.equal(5)
+      expect(insecurity.discountFromCoupon(insecurity.generateCoupon(5))).to.equal(5)
+
       expect(insecurity.discountFromCoupon(insecurity.generateCoupon(10))).to.equal(10)
       expect(insecurity.discountFromCoupon(insecurity.generateCoupon(99))).to.equal(99)
     })
