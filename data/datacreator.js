@@ -85,7 +85,6 @@ async function createUsers () {
         })
         datacache.users[key] = user
       } catch (err) {
-        console.error(`Could not insert User ${name}`)
         console.error(err)
       }
     })
