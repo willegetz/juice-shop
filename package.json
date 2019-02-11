@@ -136,19 +136,20 @@
   },
   "license": "MIT",
   "scripts": {
-    "postinstall": "cd frontend && npm install && cd .. && npm run build",
-    "serve": "concurrently --kill-others \"node app\" \"cd frontend && ng serve\"",
     "build": "cd frontend && node --max-old-space-size=8192 ./node_modules/@angular/cli/bin/ng build --aot --prod --output-hashing=none --vendor-chunk=true --source-map=false",
-    "start": "node app",
-    "lint": "standard && cd frontend && ng lint && cd ..",
-    "test": "cd frontend && ng test --watch=false --source-map=false && cd .. && nyc --report-dir=./build/reports/coverage/server-tests mocha test/server",
-    "testServer": "mocha test/server",
+    "e2e": "node test/e2eTests.js",
     "frisby": "nyc --report-dir=./build/reports/coverage/api-tests jest --silent --runInBand",
+    "frisbyFocus": "nyc --report-dir=./build/reports/coverage/api-tests jest -t \"FOCUS GET all users\"",
+    "lint": "standard && cd frontend && ng lint && cd ..",
+    "postinstall": "cd frontend && npm install && cd .. && npm run build",
+    "package": "grunt package",
     "preprotractor": "webdriver-manager update --gecko false",
     "protractor": "npm run e2e",
-    "e2e": "node test/e2eTests.js",
-    "vagrant": "cd vagrant && vagrant up",
-    "package": "grunt package"
+    "serve": "concurrently --kill-others \"node app\" \"cd frontend && ng serve\"",
+    "start": "node app",
+    "test": "cd frontend && ng test --watch=false --source-map=false && cd .. && nyc --report-dir=./build/reports/coverage/server-tests mocha test/server && npm run frisby",
+    "testServerAndLib": "mocha test/server && mocha test/lib",
+    "vagrant": "cd vagrant && vagrant up"
   },
   "engines": {
     "node": "8 - 11"
