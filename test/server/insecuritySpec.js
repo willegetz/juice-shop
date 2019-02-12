@@ -6,11 +6,12 @@ const expect = chai.expect;
 
 describe('insecurity', () => {
   let insecurity;
-
+  let z85;
   beforeEach(function () {
     const testContainer = container.new();
 
     insecurity = testContainer.build('insecurityNew');
+    z85 = container.build('z85');
   });
 
   describe('cutOffPoisonNullByte', () => {
@@ -57,8 +58,6 @@ describe('insecurity', () => {
   });
 
   describe('generateCoupon', () => {
-    const z85 = require('z85');
-
     it('returns base85-encoded month, year and discount as coupon code', () => {
       const couponDate = new Date('1980-01-01T00:00:00');
 
@@ -94,8 +93,6 @@ describe('insecurity', () => {
   });
 
   describe('discountFromCoupon', () => {
-    const z85 = require('z85');
-
     it('returns undefined when not passing in a coupon code', () => {
       const undefinedCouponCode = insecurity.discountFromCoupon(undefined);
       const nullCouponCode = insecurity.discountFromCoupon(null);
