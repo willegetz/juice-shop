@@ -1,6 +1,8 @@
 /* jslint node: true */
-const utils = require('../lib/utils')
-const challenges = require('../data/datacache').challenges
+'use strict';
+
+const utils = require('../lib/utils');
+const challenges = require('../data/datacache').challenges;
 
 const container = require('../container');
 const insecurity = container.build('insecurityNew');
@@ -10,10 +12,10 @@ module.exports = (sequelize, { STRING, INTEGER }) => {
     comment: {
       type: STRING,
       set (comment) {
-        const sanitizedComment = insecurity.sanitizeHtml(comment)
-        this.setDataValue('comment', sanitizedComment)
+        const sanitizedComment = insecurity.sanitizeHtml(comment);
+        this.setDataValue('comment', sanitizedComment);
         if (utils.notSolved(challenges.persistedXssChallengeFeedback) && utils.contains(sanitizedComment, '<iframe src="javascript:alert(`xss`)">')) {
-          utils.solve(challenges.persistedXssChallengeFeedback)
+          utils.solve(challenges.persistedXssChallengeFeedback);
         }
       }
     },
@@ -21,17 +23,17 @@ module.exports = (sequelize, { STRING, INTEGER }) => {
       type: INTEGER,
       allowNull: false,
       set (rating) {
-        this.setDataValue('rating', rating)
+        this.setDataValue('rating', rating);
         if (utils.notSolved(challenges.zeroStarsChallenge) && rating === 0) {
-          utils.solve(challenges.zeroStarsChallenge)
+          utils.solve(challenges.zeroStarsChallenge);
         }
       }
     }
-  })
+  });
 
   Feedback.associate = ({ User }) => {
-    Feedback.belongsTo(User) // no FK constraint to allow anonymous feedback posts
-  }
+    Feedback.belongsTo(User); // no FK constraint to allow anonymous feedback posts
+  };
 
-  return Feedback
-}
+  return Feedback;
+};

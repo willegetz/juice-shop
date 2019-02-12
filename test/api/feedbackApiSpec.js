@@ -1,18 +1,22 @@
-const frisby = require('frisby')
-const Joi = frisby.Joi
-const insecurity = require('../../lib/insecurity')
+'use strict';
 
-const API_URL = 'http://localhost:3000/api'
-const REST_URL = 'http://localhost:3000/rest'
+const frisby = require('frisby');
+const Joi = frisby.Joi;
 
-const authHeader = { 'Authorization': 'Bearer ' + insecurity.authorize(), 'content-type': /application\/json/ }
-const jsonHeader = { 'content-type': 'application/json' }
+const container = require('../../container');
+const insecurity = container.build('insecurityNew');
+
+const API_URL = 'http://localhost:3000/api';
+const REST_URL = 'http://localhost:3000/rest';
+
+const authHeader = { 'Authorization': 'Bearer ' + insecurity.authorize(), 'content-type': /application\/json/ };
+const jsonHeader = { 'content-type': 'application/json' };
 
 describe('/api/Feedbacks', () => {
   it('GET all feedback', () => {
     return frisby.get(API_URL + '/Feedbacks')
-      .expect('status', 200)
-  })
+      .expect('status', 200);
+  });
 
   it('POST sanitizes unsafe HTML from comment', () => {
     return frisby.get(REST_URL + '/captcha')
@@ -31,9 +35,9 @@ describe('/api/Feedbacks', () => {
           .expect('status', 201)
           .expect('json', 'data', {
             comment: 'I am a harmless comment.'
-          })
-      })
-  })
+          });
+      });
+  });
 
   it('POST fails to sanitize masked CSRF-attack by not applying sanitization recursively', () => {
     return frisby.get(REST_URL + '/captcha')
@@ -52,9 +56,9 @@ describe('/api/Feedbacks', () => {
           .expect('status', 201)
           .expect('json', 'data', {
             comment: 'The sanitize-html module up to at least version 1.4.2 has this issue: <iframe src="javascript:alert(`xss`)">'
-          })
-      })
-  })
+          });
+      });
+  });
 
   it('POST feedback in another users name as anonymous user', () => {
     return frisby.get(REST_URL + '/captcha')
@@ -75,9 +79,9 @@ describe('/api/Feedbacks', () => {
           .expect('header', 'content-type', /application\/json/)
           .expect('json', 'data', {
             UserId: 3
-          })
-      })
-  })
+          });
+      });
+  });
 
   it('POST feedback in a non-existing users name as anonymous user fails with constraint error', () => {
     return frisby.get(REST_URL + '/captcha')
@@ -97,10 +101,10 @@ describe('/api/Feedbacks', () => {
           .expect('status', 500)
           .expect('header', 'content-type', /application\/json/)
           .then(({ json }) => {
-            expect(json.errors).toContain('SQLITE_CONSTRAINT: FOREIGN KEY constraint failed')
-          })
-      })
-  })
+            expect(json.errors).toContain('SQLITE_CONSTRAINT: FOREIGN KEY constraint failed');
+          });
+      });
+  });
 
   it('POST feedback is associated with current user', () => {
     const container = require('../../container');
@@ -133,10 +137,10 @@ describe('/api/Feedbacks', () => {
               .expect('header', 'content-type', /application\/json/)
               .expect('json', 'data', {
                 UserId: 4
-              })
-          })
-      })
-  })
+              });
+          });
+      });
+  });
 
   it('POST feedback is associated with any passed user ID', () => {
     return frisby.timeout(10000).post(REST_URL + '/user/login', {
@@ -166,10 +170,10 @@ describe('/api/Feedbacks', () => {
               .expect('header', 'content-type', /application\/json/)
               .expect('json', 'data', {
                 UserId: 3
-              })
-          })
-      })
-  })
+              });
+          });
+      });
+  });
 
   it('POST feedback can be created without actually supplying comment', () => {
     return frisby.get(REST_URL + '/captcha')
@@ -189,9 +193,9 @@ describe('/api/Feedbacks', () => {
           .expect('json', 'data', {
             comment: null,
             rating: 1
-          })
-      })
-  })
+          });
+      });
+  });
 
   it('POST feedback cannot be created without actually supplying rating', () => {
     return frisby.get(REST_URL + '/captcha')
@@ -212,21 +216,21 @@ describe('/api/Feedbacks', () => {
           })
           .then(({ json }) => {
             expect(json.message.match(/notNull Violation: (Feedback\.)?rating cannot be null/))
-          })
-      })
-  })
-})
+          });
+      });
+  });
+});
 
 describe('/api/Feedbacks/:id', () => {
   it('GET existing feedback by id is forbidden via public API', () => {
     return frisby.get(API_URL + '/Feedbacks/1')
-      .expect('status', 401)
-  })
+      .expect('status', 401);
+  });
 
   it('GET existing feedback by id', () => {
     return frisby.get(API_URL + '/Feedbacks/1', { headers: authHeader })
-      .expect('status', 200)
-  })
+      .expect('status', 200);
+  });
 
   it('PUT update existing feedback is forbidden via public API', () => {
     return frisby.put(API_URL + '/Feedbacks/1', {
@@ -236,8 +240,8 @@ describe('/api/Feedbacks/:id', () => {
         rating: 1
       }
     })
-      .expect('status', 401)
-  })
+      .expect('status', 401);
+  });
 
   xit('PUT update existing feedback', () => { // FIXME Verify if put is actually meant to work
     return frisby.put(API_URL + '/Feedbacks/2', {
@@ -247,13 +251,13 @@ describe('/api/Feedbacks/:id', () => {
       }
     })
       .expect('status', 200)
-      .expect('json', 'data', { rating: 0 })
-  })
+      .expect('json', 'data', { rating: 0 });
+  });
 
   it('DELETE existing feedback is forbidden via public API', () => {
     return frisby.del(API_URL + '/Feedbacks/1')
-      .expect('status', 401)
-  })
+      .expect('status', 401);
+  });
 
   it('DELETE existing feedback', () => {
     return frisby.get(REST_URL + '/captcha')
@@ -273,9 +277,9 @@ describe('/api/Feedbacks/:id', () => {
           .expect('jsonTypes', 'data', { id: Joi.number() })
           .then(({ json }) => {
             return frisby.del(API_URL + '/Feedbacks/' + json.data.id, { headers: authHeader })
-              .expect('status', 200)
+              .expect('status', 200);
           }
-          )
-      })
-  })
-})
+          );
+      });
+  });
+});
