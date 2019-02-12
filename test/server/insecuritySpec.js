@@ -99,7 +99,7 @@ describe('insecurity', () => {
 
       expect(undefinedCouponCode).to.equal(undefined);
       expect(nullCouponCode).to.equal(undefined);
-    })
+    });
 
     it('returns undefined for malformed coupon code', () => {
       const emptyStringCouponCode = insecurity.discountFromCoupon('');

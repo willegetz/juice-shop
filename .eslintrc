@@ -1,0 +1,44 @@
+{
+    "extends": "eslint:recommended",
+    "parserOptions": {
+        "ecmaVersion": 2017
+    },
+    "rules": {
+        "no-console": 0,
+        "no-extra-boolean-cast": 0,
+        "no-implicit-coercion": "warn",
+        "no-irregular-whitespace": 0,
+        "no-unused-vars": 1,
+        "no-undef": "warn",
+        "semi": 2
+    },
+    "globals": {
+        "$": true,
+        "angular": true,
+        "async": true,
+        "clearInterval": true,
+        "j": true,
+        "jslogger": true,
+        "setTimeout": true,
+        "signet": true,
+        "modules": true,
+
+        "__dirname": true,
+        "afterEach": true,
+        "beforeEach": true,
+        "describe": true,
+        "expect": true,
+        "global": true,
+        "inject": true,
+        "it": true,
+        "module": true,
+        "sinon": true,
+        
+        "alert": true,
+        "console": true,
+        "document": true,
+        "process": true,
+        "require": true
+    }
+}
+

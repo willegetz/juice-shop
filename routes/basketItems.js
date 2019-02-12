@@ -1,27 +1,29 @@
-const utils = require('../lib/utils')
-const challenges = require('../data/datacache').challenges
-const models = require('../models/index')
+'use strict';
+
+const utils = require('../lib/utils');
+const challenges = require('../data/datacache').challenges;
+const models = require('../models/index');
 
 module.exports = function addBasketItem (authenticatedUsers) {
   return (req, res, next) => {
-    var result = utils.parseJsonCustom(req.rawBody)
-    var productIds = []
-    var basketIds = []
-    var quantities = []
+    var result = utils.parseJsonCustom(req.rawBody);
+    var productIds = [];
+    var basketIds = [];
+    var quantities = [];
 
     for (var i = 0; i < result.length; i++) {
       if (result[i].key === 'ProductId') {
-        productIds.push(result[i].value)
+        productIds.push(result[i].value);
       } else if (result[i].key === 'BasketId') {
-        basketIds.push(result[i].value)
+        basketIds.push(result[i].value);
       } else if (result[i].key === 'quantity') {
-        quantities.push(result[i].value)
+        quantities.push(result[i].value);
       }
     }
 
-    const user = authenticatedUsers.from(req)
+    const user = authenticatedUsers.from(req);
     if (user && basketIds[0] && basketIds[0] !== 'undefined' && user.bid != basketIds[0]) { // eslint-disable-line eqeqeq
-      res.status(401).send('{\'error\' : \'Invalid BasketId\'}')
+      res.status(401).send('{\'error\' : \'Invalid BasketId\'}');
     } else {
       const basketItem = {
         ProductId: productIds[productIds.length - 1],
@@ -31,20 +33,20 @@ module.exports = function addBasketItem (authenticatedUsers) {
 
       if (utils.notSolved(challenges.basketManipulateChallenge)) {
         if (user && basketItem.BasketId && basketItem.BasketId !== 'undefined' && user.bid != basketItem.BasketId) { // eslint-disable-line eqeqeq
-          utils.solve(challenges.basketManipulateChallenge)
+          utils.solve(challenges.basketManipulateChallenge);
         }
       }
 
-      const basketItemInstance = models.BasketItem.build(basketItem)
+      const basketItemInstance = models.BasketItem.build(basketItem);
       basketItemInstance.save().then((basketItem) => {
         basketItem = {
           status: 'success',
           data: basketItem
-        }
-        res.json(basketItem)
+        };
+        res.json(basketItem);
       }).catch(error => {
-        next(error)
-      })
+        next(error);
+      });
     }
-  }
-}
+  };
+};

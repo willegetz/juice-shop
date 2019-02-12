@@ -1,15 +1,17 @@
-const frisby = require('frisby')
-const insecurity = require('../../lib/insecurity')
+'use strict';
 
-const API_URL = 'http://localhost:3000/api'
+const frisby = require('frisby');
+const insecurity = require('../../lib/insecurity');
 
-const authHeader = { 'Authorization': 'Bearer ' + insecurity.authorize(), 'content-type': 'application/json' }
+const API_URL = 'http://localhost:3000/api';
+
+const authHeader = { 'Authorization': 'Bearer ' + insecurity.authorize(), 'content-type': 'application/json' };
 
 describe('/api/BasketItems', () => {
   it('GET all basket items is forbidden via public API', () => {
     return frisby.get(API_URL + '/BasketItems')
-      .expect('status', 401)
-  })
+      .expect('status', 401);
+  });
 
   it('POST new basket item is forbidden via public API', () => {
     return frisby.post(API_URL + '/BasketItems', {
@@ -17,13 +19,13 @@ describe('/api/BasketItems', () => {
       ProductId: 1,
       quantity: 1
     })
-      .expect('status', 401)
-  })
+      .expect('status', 401);
+  });
 
   it('GET all basket items', () => {
     return frisby.get(API_URL + '/BasketItems', { headers: authHeader })
-      .expect('status', 200)
-  })
+      .expect('status', 200);
+  });
 
   it('POST new basket item', () => {
     return frisby.post(API_URL + '/BasketItems', {
@@ -34,27 +36,27 @@ describe('/api/BasketItems', () => {
         quantity: 1
       }
     })
-      .expect('status', 200)
-  })
-})
+      .expect('status', 200);
+  });
+});
 
 describe('/api/BasketItems/:id', () => {
   it('GET basket item by id is forbidden via public API', () => {
     return frisby.get(API_URL + '/BasketItems/1')
-      .expect('status', 401)
-  })
+      .expect('status', 401);
+  });
 
   it('PUT update basket item is forbidden via public API', () => {
     return frisby.put(API_URL + '/BasketItems/1', {
       quantity: 2
     }, { json: true })
-      .expect('status', 401)
-  })
+      .expect('status', 401);
+  });
 
   it('DELETE basket item is forbidden via public API', () => {
     return frisby.del(API_URL + '/BasketItems/1')
-      .expect('status', 401)
-  })
+      .expect('status', 401);
+  });
 
   it('GET newly created basket item by id', () => {
     return frisby.post(API_URL + '/BasketItems', {
@@ -68,9 +70,9 @@ describe('/api/BasketItems/:id', () => {
       .expect('status', 200)
       .then(({ json }) => {
         return frisby.get(API_URL + '/BasketItems/' + json.data.id, { headers: authHeader })
-          .expect('status', 200)
-      })
-  })
+          .expect('status', 200);
+      });
+  });
 
   it('PUT update newly created basket item', () => {
     return frisby.post(API_URL + '/BasketItems', {
@@ -90,9 +92,9 @@ describe('/api/BasketItems/:id', () => {
           }
         })
           .expect('status', 200)
-          .expect('json', 'data', { quantity: 20 })
-      })
-  })
+          .expect('json', 'data', { quantity: 20 });
+      });
+  });
 
   it('DELETE newly created basket item', () => {
     return frisby.post(API_URL + '/BasketItems', {
@@ -106,7 +108,7 @@ describe('/api/BasketItems/:id', () => {
       .expect('status', 200)
       .then(({ json }) => {
         return frisby.del(API_URL + '/BasketItems/' + json.data.id, { headers: authHeader })
-          .expect('status', 200)
-      })
-  })
-})
+          .expect('status', 200);
+      });
+  });
+});
