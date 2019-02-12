@@ -1,7 +1,9 @@
 'use strict';
 
 const frisby = require('frisby');
-const insecurity = require('../../lib/insecurity');
+
+const container = require('../../container');
+const insecurity = container.build('insecurityNew');
 
 const API_URL = 'http://localhost:3000/api';
 

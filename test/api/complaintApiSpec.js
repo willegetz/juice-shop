@@ -1,10 +1,14 @@
-const frisby = require('frisby')
-const Joi = frisby.Joi
-const insecurity = require('../../lib/insecurity')
+'use strict';
 
-const API_URL = 'http://localhost:3000/api'
+const frisby = require('frisby');
+const Joi = frisby.Joi;
 
-const authHeader = { 'Authorization': 'Bearer ' + insecurity.authorize(), 'content-type': 'application/json' }
+const container = require('../../container');
+const insecurity = container.build('insecurityNew');
+
+const API_URL = 'http://localhost:3000/api';
+
+const authHeader = { 'Authorization': 'Bearer ' + insecurity.authorize(), 'content-type': 'application/json' };
 
 describe('/api/Complaints', () => {
   it('POST new complaint', () => {
@@ -20,25 +24,25 @@ describe('/api/Complaints', () => {
         id: Joi.number(),
         createdAt: Joi.string(),
         updatedAt: Joi.string()
-      })
-  })
+      });
+  });
 
   it('GET all complaints is forbidden via public API', () => {
     return frisby.get(API_URL + '/Complaints')
-      .expect('status', 401)
-  })
+      .expect('status', 401);
+  });
 
   it('GET all complaints', () => {
     return frisby.get(API_URL + '/Complaints', { headers: authHeader })
-      .expect('status', 200)
-  })
-})
+      .expect('status', 200);
+  });
+});
 
 describe('/api/Complaints/:id', () => {
   it('GET existing complaint by id is forbidden', () => {
     return frisby.get(API_URL + '/Complaints/1', { headers: authHeader })
-      .expect('status', 401)
-  })
+      .expect('status', 401);
+  });
 
   it('PUT update existing complaint is forbidden', () => {
     return frisby.put(API_URL + '/Complaints/1', {
@@ -47,11 +51,11 @@ describe('/api/Complaints/:id', () => {
         message: 'Should not work...'
       }
     })
-      .expect('status', 401)
-  })
+      .expect('status', 401);
+  });
 
   it('DELETE existing complaint is forbidden', () => {
     return frisby.del(API_URL + '/Complaints/1', { headers: authHeader })
-      .expect('status', 401)
-  })
-})
+      .expect('status', 401);
+  });
+});
