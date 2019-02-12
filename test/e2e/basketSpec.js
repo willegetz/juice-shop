@@ -1,6 +1,8 @@
 'use strict';
 
-const insecurity = require('../../lib/insecurity');
+const container = require('../../container');
+const insecurity = container.build('insecurityNew');
+
 const config = require('config');
 
 describe('/#/basket', () => {

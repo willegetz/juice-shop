@@ -1,10 +1,14 @@
-const frisby = require('frisby')
-const Joi = frisby.Joi
-const insecurity = require('../../lib/insecurity')
+'use strict';
+
+const frisby = require('frisby');
+const Joi = frisby.Joi;
+
+const container = require('../../container');
+const insecurity = container.build('insecurityNew');
 
 const API_URL = 'http://localhost:3000/b2b/v2/orders'
 
-const authHeader = { 'Authorization': 'Bearer ' + insecurity.authorize(), 'content-type': 'application/json' }
+const authHeader = { 'Authorization': 'Bearer ' + insecurity.authorize(), 'content-type': 'application/json' };
 
 describe('/b2b/v2/orders', () => {
   it('POST endless loop exploit in "orderLinesData" will raise explicit error', () => {
@@ -15,8 +19,8 @@ describe('/b2b/v2/orders', () => {
       }
     })
       .expect('status', 500)
-      .expect('bodyContains', 'Infinite loop detected - reached max iterations')
-  })
+      .expect('bodyContains', 'Infinite loop detected - reached max iterations');
+  });
 
   it('POST busy spinning regex attack does not raise an error', () => {
     return frisby.post(API_URL, {
@@ -25,8 +29,8 @@ describe('/b2b/v2/orders', () => {
         orderLinesData: '/((a+)+)b/.test("aaaaaaaaaaaaaaaaaaaaaaaaaaaaa")'
       }
     })
-      .expect('status', 503)
-  })
+      .expect('status', 503);
+  });
 
   it('POST sandbox breakout attack in "orderLinesData" will raise error', () => {
     return frisby.post(API_URL, {
@@ -35,13 +39,13 @@ describe('/b2b/v2/orders', () => {
         orderLinesData: 'this.constructor.constructor("return process")().exit()'
       }
     })
-      .expect('status', 500)
-  })
+      .expect('status', 500);
+  });
 
   it('POST new B2B order is forbidden without authorization token', () => {
     return frisby.post(API_URL, {})
-      .expect('status', 401)
-  })
+      .expect('status', 401);
+  });
 
   it('POST new B2B order accepts arbitrary valid JSON', () => {
     return frisby.post(API_URL, {
@@ -57,8 +61,8 @@ describe('/b2b/v2/orders', () => {
         cid: Joi.string(),
         orderNo: Joi.string(),
         paymentDue: Joi.string()
-      })
-  })
+      });
+  });
 
   it('POST new B2B order has passed "cid" in response', () => {
     return frisby.post(API_URL, {
@@ -70,6 +74,6 @@ describe('/b2b/v2/orders', () => {
       .expect('status', 200)
       .expect('json', {
         cid: 'test'
-      })
-  })
-})
+      });
+  });
+});
