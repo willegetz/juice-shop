@@ -1,5 +1,6 @@
 /* jslint node: true */
-const insecurity = require('../lib/insecurity')
+const container = require('../container');
+const insecurity = container.build('insecurityNew');
 
 module.exports = (sequelize, { STRING, INTEGER }) => {
   const SecurityAnswer = sequelize.define('SecurityAnswer', {

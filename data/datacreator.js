@@ -4,7 +4,9 @@ const datacache = require('./datacache')
 const config = require('config')
 const utils = require('../lib/utils')
 const mongodb = require('./mongodb')
-const insecurity = require('../lib/insecurity')
+
+const container = require('../container');
+const insecurity = container.build('insecurityNew');
 
 const fs = require('fs')
 const path = require('path')

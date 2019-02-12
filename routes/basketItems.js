@@ -1,7 +1,9 @@
 const utils = require('../lib/utils')
 const challenges = require('../data/datacache').challenges
-const insecurity = require('../lib/insecurity')
 const models = require('../models/index')
+
+const container = require('../container');
+const insecurity = container.build('insecurityNew');
 
 module.exports = function addBasketItem () {
   return (req, res, next) => {

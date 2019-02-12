@@ -1,8 +1,10 @@
 const utils = require('../lib/utils')
-const insecurity = require('../lib/insecurity')
 const safeEval = require('notevil')
 const vm = require('vm')
 const challenges = require('../data/datacache').challenges
+
+const container = require('../container');
+const insecurity = container.build('insecurityNew');
 
 module.exports = function b2bOrder () {
   return ({ body }, res, next) => {

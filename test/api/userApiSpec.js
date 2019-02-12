@@ -1,6 +1,8 @@
 const frisby = require('frisby')
 const Joi = frisby.Joi
-const insecurity = require('../../lib/insecurity')
+
+const container = require('../../container');
+const insecurity = container.build('insecurityNew');
 
 const API_URL = 'http://localhost:3000/api'
 const REST_URL = 'http://localhost:3000/rest'

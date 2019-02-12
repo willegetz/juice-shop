@@ -1,6 +1,8 @@
 const utils = require('../lib/utils')
-const insecurity = require('../lib/insecurity')
 const models = require('../models/index')
+
+const container = require('../container');
+const insecurity = container.build('insecurityNew');
 
 module.exports = function retrieveUserList () {
   return (req, res, next) => {

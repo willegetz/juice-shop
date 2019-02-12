@@ -1,7 +1,9 @@
 /* jslint node: true */
-const insecurity = require('../lib/insecurity')
 const utils = require('../lib/utils')
 const challenges = require('../data/datacache').challenges
+
+const container = require('../container');
+const insecurity = container.build('insecurityNew');
 
 module.exports = (sequelize, { STRING, BOOLEAN }) => {
   const User = sequelize.define('User', {
