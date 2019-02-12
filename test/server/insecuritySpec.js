@@ -5,21 +5,19 @@ const container = require('../../container');
 const expect = chai.expect
 
 describe('insecurity', () => {
-  const insecurity = require('../../lib/insecurity')
-
-  let insecurityNew;
+  let insecurity;
 
   beforeEach(function () {
     const testContainer = container.new();
 
-    insecurityNew = testContainer.build('insecurityNew');
+    insecurity = testContainer.build('insecurityNew');
   });
 
   describe('cutOffPoisonNullByte', () => {
     it('returns string unchanged if it contains no null byte', function () {
       const fileName = 'file.exe.pdf';
 
-      const cleansedFileName = insecurityNew.cutOffPoisonNullByte(fileName);
+      const cleansedFileName = insecurity.cutOffPoisonNullByte(fileName);
 
       return expect(cleansedFileName).to.equal(fileName);
     })
@@ -28,7 +26,7 @@ describe('insecurity', () => {
       const fileNameWithNullByte = 'file.exe%00.pdf';
       const excpectedCleansedFileName = 'file.exe';
 
-      const actualCleansedFileName = insecurityNew.cutOffPoisonNullByte(fileNameWithNullByte);
+      const actualCleansedFileName = insecurity.cutOffPoisonNullByte(fileNameWithNullByte);
 
       return expect(actualCleansedFileName).to.equal(excpectedCleansedFileName);
     })
