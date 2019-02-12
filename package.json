@@ -64,6 +64,7 @@
     "config": "~2.0.0",
     "cookie-parser": "~1.4",
     "cors": "~2.8.5",
+    "dject": "^1.11.6",
     "dottie": "~2.0.1",
     "download": "~7.1.0",
     "epilogue-js": "~0.7",
@@ -147,7 +148,7 @@
     "protractor": "npm run e2e",
     "serve": "concurrently --kill-others \"node app\" \"cd frontend && ng serve\"",
     "start": "node app",
-    "test": "cd frontend && ng test --watch=false --source-map=false && cd .. && nyc --report-dir=./build/reports/coverage/server-tests mocha test/server && npm run frisby",
+    "test": "cd frontend && ng test --watch=false --source-map=false && cd .. && nyc --report-dir=./build/reports/coverage/server-tests mocha test/server && mocha test/lib",
     "testServerAndLib": "mocha test/server && mocha test/lib",
     "vagrant": "cd vagrant && vagrant up"
   },

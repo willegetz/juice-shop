@@ -2,9 +2,10 @@
 
 const chai = require('chai')
 const expect = chai.expect
+const container = require('../../container');
 
 describe('authenticatedUsers', () => {
-    const authenticatedUsers = require('../../lib/authenticatedUsers');
+    const authenticatedUsers = container.build('authenticatedUsersPersistence');
 
     it('returns user by associated token', () => {
         authenticatedUsers.put('11111', { data: { id: 1 } })

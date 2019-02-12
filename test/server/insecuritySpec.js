@@ -1,16 +1,36 @@
+'use strict'
+
 const chai = require('chai')
+const container = require('../../container');
 const expect = chai.expect
 
 describe('insecurity', () => {
   const insecurity = require('../../lib/insecurity')
 
+  let insecurityNew;
+
+  beforeEach(function () {
+    const testContainer = container.new();
+
+    insecurityNew = testContainer.build('insecurityNew');
+  });
+
   describe('cutOffPoisonNullByte', () => {
-    it('returns string unchanged if it contains no null byte', () => {
-      expect(insecurity.cutOffPoisonNullByte('file.exe.pdf')).to.equal('file.exe.pdf')
+    it('returns string unchanged if it contains no null byte', function () {
+      const fileName = 'file.exe.pdf';
+
+      const cleansedFileName = insecurityNew.cutOffPoisonNullByte(fileName);
+
+      return expect(cleansedFileName).to.equal(fileName);
     })
 
-    it('returns string up to null byte', () => {
-      expect(insecurity.cutOffPoisonNullByte('file.exe%00.pdf')).to.equal('file.exe')
+    it('returns string up to null byte', function () {
+      const fileNameWithNullByte = 'file.exe%00.pdf';
+      const excpectedCleansedFileName = 'file.exe';
+
+      const actualCleansedFileName = insecurityNew.cutOffPoisonNullByte(fileNameWithNullByte);
+
+      return expect(actualCleansedFileName).to.equal(excpectedCleansedFileName);
     })
   })
 
@@ -30,13 +50,13 @@ describe('insecurity', () => {
 
     it('returns base85-encoded month, year and discount as coupon code', () => {
       const couponDate = new Date('1980-01-01T00:00:00');
-      
+
       const actualCouponEncoded = insecurity.generateCoupon(20, couponDate);
       const expectedCouponEncoded = 'n<MiifFb4l';
 
       const actualCouponDecoded = z85.decode(actualCouponEncoded);
       const expectedCouponDecoded = 'JAN80-20';
-     
+
       expect(actualCouponEncoded).to.equal(expectedCouponEncoded);
       expect(actualCouponDecoded.toString()).to.equal(expectedCouponDecoded);
     })
@@ -85,41 +105,6 @@ describe('insecurity', () => {
 
       expect(insecurity.discountFromCoupon(insecurity.generateCoupon(10))).to.equal(10)
       expect(insecurity.discountFromCoupon(insecurity.generateCoupon(99))).to.equal(99)
-    })
-  })
-
-  describe('authenticatedUsers', () => {
-    it('returns user by associated token', () => {
-      insecurity.authenticatedUsers.put('11111', { data: { id: 1 } })
-
-      expect(insecurity.authenticatedUsers.get('11111')).to.deep.equal({ data: { id: 1 } })
-    })
-
-    it('returns undefined if no token is passed in', () => {
-      expect(insecurity.authenticatedUsers.get(undefined)).to.equal(undefined)
-      expect(insecurity.authenticatedUsers.get(null)).to.equal(undefined)
-    })
-
-    it('returns token by associated user', () => {
-      insecurity.authenticatedUsers.put('11111', { data: { id: 1 } })
-
-      expect(insecurity.authenticatedUsers.tokenOf({ id: 1 })).to.equal('11111')
-    })
-
-    it('returns undefined if no user is passed in', () => {
-      expect(insecurity.authenticatedUsers.tokenOf(undefined)).to.equal(undefined)
-      expect(insecurity.authenticatedUsers.tokenOf(null)).to.equal(undefined)
-    })
-
-    it('returns user by associated token from request', () => {
-      insecurity.authenticatedUsers.put('11111', { data: { id: 1 } })
-
-      expect(insecurity.authenticatedUsers.from({ headers: { authorization: 'Bearer 11111' } })).to.deep.equal({ data: { id: 1 } })
-    })
-
-    it('returns undefined if no token is present in request', () => {
-      expect(insecurity.authenticatedUsers.from({ headers: {} })).to.equal(undefined)
-      expect(insecurity.authenticatedUsers.from({})).to.equal(undefined)
     })
   })
 })
