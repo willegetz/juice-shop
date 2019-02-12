@@ -1,10 +1,12 @@
 const utils = require('../lib/utils')
-const insecurity = require('../lib/insecurity')
 const models = require('../models/index')
 const cache = require('../data/datacache')
 const challenges = cache.challenges
 
-module.exports = function changePassword () {
+const container = require('../container');
+const insecurity = container.build('insecurityNew');
+
+module.exports = function changePassword (authenticatedUsers) {
   return ({ query, headers, connection }, res, next) => {
     const currentPassword = query.current
     const newPassword = query.new
@@ -15,7 +17,7 @@ module.exports = function changePassword () {
       res.status(401).send('New and repeated password do not match.')
     } else {
       const token = headers['authorization'] ? headers['authorization'].substr('Bearer='.length) : null
-      const loggedInUser = insecurity.authenticatedUsers.get(token)
+      const loggedInUser = authenticatedUsers.get(token)
       if (loggedInUser) {
         if (currentPassword && insecurity.hash(currentPassword) !== loggedInUser.data.password) {
           res.status(401).send('Current password is not correct.')

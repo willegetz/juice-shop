@@ -1,12 +1,11 @@
 const utils = require('../lib/utils')
-const insecurity = require('../lib/insecurity')
 const models = require('../models/index')
 const cache = require('../data/datacache')
 const challenges = cache.challenges
 
-module.exports = function saveLoginIp () {
+module.exports = function saveLoginIp (authenticatedUsers) {
   return (req, res, next) => {
-    var loggedInUser = insecurity.authenticatedUsers.from(req)
+    var loggedInUser = authenticatedUsers.from(req)
     if (loggedInUser !== undefined) {
       var lastLoginIp = req.headers['true-client-ip']
       if (utils.notSolved(challenges.httpHeaderXssChallenge) && lastLoginIp === '<iframe src="javascript:alert(`xss`)>') {

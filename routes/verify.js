@@ -1,5 +1,4 @@
 const utils = require('../lib/utils')
-const insecurity = require('../lib/insecurity')
 const jwt = require('jsonwebtoken')
 const models = require('../models/index')
 const cache = require('../data/datacache')
@@ -7,10 +6,10 @@ const Op = models.Sequelize.Op
 const challenges = cache.challenges
 const products = cache.products
 
-exports.forgedFeedbackChallenge = () => (req, res, next) => {
+exports.forgedFeedbackChallenge = (authenticatedUsers) => (req, res, next) => {
   /* jshint eqeqeq:false */
   if (utils.notSolved(challenges.forgedFeedbackChallenge)) {
-    const user = insecurity.authenticatedUsers.from(req)
+    const user = authenticatedUsers.from(req)
     const userId = user && user.data ? user.data.id : undefined
     if (req.body && req.body.UserId && req.body.UserId != userId) { // eslint-disable-line eqeqeq
       utils.solve(challenges.forgedFeedbackChallenge)

@@ -1,6 +1,5 @@
 const utils = require('../lib/utils')
 const challenges = require('../data/datacache').challenges
-const insecurity = require('../lib/insecurity')
 const db = require('../data/mongodb')
 
 // Blocking sleep function as in native MongoDB
@@ -15,7 +14,7 @@ global.sleep = time => {
   }
 }
 
-module.exports = function productReviews () {
+module.exports = function productReviews (authenticatedUsers) {
   return (req, res, next) => {
     const id = req.params.id
 
@@ -28,7 +27,7 @@ module.exports = function productReviews () {
           utils.solve(challenges.noSqlCommandChallenge)
         }
       }
-      const user = insecurity.authenticatedUsers.from(req)
+      const user = authenticatedUsers.from(req)
       for (var i = 0; i < reviews.length; i++) {
         if (user === undefined || reviews[i].likedBy.includes(user.data.email)) {
           reviews[i].liked = true

@@ -2,10 +2,7 @@ const utils = require('../lib/utils')
 const challenges = require('../data/datacache').challenges
 const models = require('../models/index')
 
-const container = require('../container');
-const insecurity = container.build('insecurityNew');
-
-module.exports = function addBasketItem () {
+module.exports = function addBasketItem (authenticatedUsers) {
   return (req, res, next) => {
     var result = utils.parseJsonCustom(req.rawBody)
     var productIds = []
@@ -22,7 +19,7 @@ module.exports = function addBasketItem () {
       }
     }
 
-    const user = insecurity.authenticatedUsers.from(req)
+    const user = authenticatedUsers.from(req)
     if (user && basketIds[0] && basketIds[0] !== 'undefined' && user.bid != basketIds[0]) { // eslint-disable-line eqeqeq
       res.status(401).send('{\'error\' : \'Invalid BasketId\'}')
     } else {

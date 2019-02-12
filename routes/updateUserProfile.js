@@ -1,9 +1,8 @@
 const models = require('../models/index')
-const insecurity = require('../lib/insecurity')
 
-module.exports = function updateUserProfile () {
+module.exports = function updateUserProfile (authenticatedUsers) {
   return (req, res, next) => {
-    const loggedInUser = insecurity.authenticatedUsers.get(req.cookies.token)
+    const loggedInUser = authenticatedUsers.get(req.cookies.token)
     if (loggedInUser) {
       models.User.findByPk(loggedInUser.data.id).then(user => {
         return user.updateAttributes({ username: req.body.username })

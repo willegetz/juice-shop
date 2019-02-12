@@ -1,13 +1,12 @@
 const utils = require('../lib/utils')
 const fs = require('fs')
 const models = require('../models/index')
-const insecurity = require('../lib/insecurity')
 
-module.exports = function fileUpload () {
+module.exports = function fileUpload (authenticatedUsers) {
   return (req, res, next) => {
     const file = req.file
     if (utils.endsWith(file.originalname.toLowerCase(), '.jpg')) {
-      const loggedInUser = insecurity.authenticatedUsers.get(req.cookies.token)
+      const loggedInUser = authenticatedUsers.get(req.cookies.token)
       if (loggedInUser) {
         const buffer = file.buffer
         fs.open('frontend/dist/frontend/assets/public/images/uploads/' + loggedInUser.data.id + '.jpg', 'w', function (err, fd) {

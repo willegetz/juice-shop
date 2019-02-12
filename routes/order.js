@@ -9,13 +9,13 @@ const challenges = require('../data/datacache').challenges
 const config = require('config')
 const db = require('../data/mongodb')
 
-module.exports = function placeOrder () {
+module.exports = function placeOrder (authenticatedUsers) {
   return (req, res, next) => {
     const id = req.params.id
     models.Basket.find({ where: { id }, include: [ { model: models.Product, paranoid: false } ] })
       .then(basket => {
         if (basket) {
-          const customer = insecurity.authenticatedUsers.from(req)
+          const customer = authenticatedUsers.from(req)
           const email = customer ? customer.data ? customer.data.email : '' : ''
           const orderId = insecurity.hash(email).slice(0, 4) + '-' + utils.randomHexString(16)
           const pdfFile = 'order_' + orderId + '.pdf'

@@ -103,6 +103,9 @@ describe('/api/Feedbacks', () => {
   })
 
   it('POST feedback is associated with current user', () => {
+    const container = require('../../container');
+    container.build('authenticatedUsersPersistence');
+
     return frisby.timeout(10000).post(REST_URL + '/user/login', {
       headers: jsonHeader,
       body: {

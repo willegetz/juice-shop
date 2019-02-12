@@ -6,22 +6,30 @@ chai.use(sinonChai)
 const cache = require('../../data/datacache')
 const insecurity = require('../../lib/insecurity')
 
+const container = require('../../container');
+
 describe('verify', () => {
   const verify = require('../../routes/verify')
   const challenges = require('../../data/datacache').challenges
 
+  let authenticatedUsers;
+
   beforeEach(() => {
+    const testContainer = container.new();
+
     this.req = { body: {}, headers: {} }
     this.res = { json: sinon.spy() }
     this.next = sinon.spy()
     this.save = () => ({
       then () { }
     })
+
+    authenticatedUsers = testContainer.build('authenticatedUsersPersistence')
   })
 
   describe('"forgedFeedbackChallenge"', () => {
     beforeEach(() => {
-      insecurity.authenticatedUsers.put('token12345', {
+      authenticatedUsers.put('token12345', {
         data: {
           id: 42,
           email: 'test@juice-sh.op'
@@ -34,7 +42,7 @@ describe('verify', () => {
       this.req.body.UserId = 42
       this.req.headers = { authorization: 'Bearer token12345' }
 
-      verify.forgedFeedbackChallenge()(this.req, this.res, this.next)
+      verify.forgedFeedbackChallenge(authenticatedUsers)(this.req, this.res, this.next)
 
       expect(challenges.forgedFeedbackChallenge.solved).to.equal(false)
     })
@@ -43,7 +51,7 @@ describe('verify', () => {
       this.req.body.UserId = undefined
       this.req.headers = { authorization: 'Bearer token12345' }
 
-      verify.forgedFeedbackChallenge()(this.req, this.res, this.next)
+      verify.forgedFeedbackChallenge(authenticatedUsers)(this.req, this.res, this.next)
 
       expect(challenges.forgedFeedbackChallenge.solved).to.equal(false)
     })
@@ -52,7 +60,7 @@ describe('verify', () => {
       this.req.body.UserId = 1
       this.req.headers = { authorization: 'Bearer token12345' }
 
-      verify.forgedFeedbackChallenge()(this.req, this.res, this.next)
+      verify.forgedFeedbackChallenge(authenticatedUsers)(this.req, this.res, this.next)
 
       expect(challenges.forgedFeedbackChallenge.solved).to.equal(true)
     })
@@ -61,7 +69,7 @@ describe('verify', () => {
       this.req.body.UserId = 1
       this.req.headers = {}
 
-      verify.forgedFeedbackChallenge()(this.req, this.res, this.next)
+      verify.forgedFeedbackChallenge(authenticatedUsers)(this.req, this.res, this.next)
 
       expect(challenges.forgedFeedbackChallenge.solved).to.equal(true)
     })

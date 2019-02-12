@@ -5,11 +5,11 @@ const insecurity = require('../lib/insecurity')
 const jade = require('jade')
 const config = require('config')
 
-module.exports = function getUserProfile () {
+module.exports = function getUserProfile (authenticatedUsers) {
   return (req, res, next) => {
     fs.readFile('views/userProfile.jade', function (err, buf) {
       if (err) throw err
-      const loggedInUser = insecurity.authenticatedUsers.get(req.cookies.token)
+      const loggedInUser = authenticatedUsers.get(req.cookies.token)
       if (loggedInUser) {
         models.User.findByPk(loggedInUser.data.id).then(user => {
           let jadeTemplate = buf.toString()

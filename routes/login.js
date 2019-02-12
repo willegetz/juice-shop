@@ -5,7 +5,7 @@ const challenges = require('../data/datacache').challenges
 const users = require('../data/datacache').users
 const config = require('config')
 
-module.exports = function login () {
+module.exports = function login (authenticatedUsers) {
   function afterLogin (user, res, next) {
     if (utils.notSolved(challenges.loginAdminChallenge) && user.data.id === users.admin.id) {
       utils.solve(challenges.loginAdminChallenge)
@@ -18,7 +18,7 @@ module.exports = function login () {
       .then(([basket, created]) => {
         const token = insecurity.authorize(user)
         user.bid = basket.id // keep track of original basket for challenge solution check
-        insecurity.authenticatedUsers.put(token, user)
+        authenticatedUsers.put(token, user)
         res.json({ authentication: { token, bid: basket.id, umail: user.data.email } })
       }).catch(error => {
         next(error)

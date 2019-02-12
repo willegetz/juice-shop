@@ -1,7 +1,9 @@
 const path = require('path')
 const utils = require('../lib/utils')
-const insecurity = require('../lib/insecurity')
 const challenges = require('../data/datacache').challenges
+
+const container = require('../container');
+const insecurity = container.build('insecurityNew');
 
 module.exports = function servePublicFiles () {
   return ({ params, query }, res, next) => {

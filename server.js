@@ -1,3 +1,6 @@
+const container = require('./container');
+const authenticatedUsersPersistence = container.build('authenticatedUsersPersistence');
+
 const path = require('path')
 const fs = require('fs-extra')
 const morgan = require('morgan')
@@ -136,8 +139,8 @@ app.use(cookieParser('kekse'))
 app.use(bodyParser.urlencoded({ extended: true }))
 /* File Upload */
 app.post('/file-upload', upload.single('file'), fileUpload())
-app.post('/profile/image/file', upload.single('file'), profileImageFileUpload())
-app.post('/profile/image/url', upload.single('file'), profileImageUrlUpload())
+app.post('/profile/image/file', upload.single('file'), profileImageFileUpload(authenticatedUsersPersistence))
+app.post('/profile/image/url', upload.single('file'), profileImageUrlUpload(authenticatedUsersPersistence))
 
 app.use(bodyParser.text({ type: '*/*' }))
 app.use(function jsonParser (req, res, next) {
@@ -199,7 +202,7 @@ app.use('/rest/user/authentication-details', insecurity.isAuthorized())
 app.use('/rest/basket/:id', insecurity.isAuthorized())
 app.use('/rest/basket/:id/order', insecurity.isAuthorized())
 /* Challenge evaluation before epilogue takes over */
-app.post('/api/Feedbacks', verify.forgedFeedbackChallenge())
+app.post('/api/Feedbacks', verify.forgedFeedbackChallenge(authenticatedUsersPersistence))
 /* Captcha verification before epilogue takes over */
 app.post('/api/Feedbacks', captcha.verifyCaptcha())
 /* Captcha Bypass challenge verification */
@@ -209,7 +212,7 @@ app.post('/api/Users', verify.registerAdminChallenge())
 /* Unauthorized users are not allowed to access B2B API */
 app.use('/b2b/v2', insecurity.isAuthorized())
 /* Add item to basket */
-app.post('/api/BasketItems', basketItems())
+app.post('/api/BasketItems', basketItems(authenticatedUsersPersistence))
 
 /* Verifying DB related challenges can be postponed until the next request for challenges is coming via epilogue */
 app.use(verify.databaseRelatedChallenges())
@@ -236,15 +239,15 @@ for (const modelName of autoModels) {
 }
 
 /* Custom Restful API */
-app.post('/rest/user/login', login())
-app.get('/rest/user/change-password', changePassword())
+app.post('/rest/user/login', login(authenticatedUsersPersistence))
+app.get('/rest/user/change-password', changePassword(authenticatedUsersPersistence))
 app.post('/rest/user/reset-password', resetPassword())
 app.get('/rest/user/security-question', securityQuestion())
-app.get('/rest/user/whoami', currentUser())
-app.get('/rest/user/authentication-details', authenticatedUsers())
+app.get('/rest/user/whoami', currentUser(authenticatedUsersPersistence))
+app.get('/rest/user/authentication-details', authenticatedUsers(authenticatedUsersPersistence))
 app.get('/rest/product/search', search())
-app.get('/rest/basket/:id', basket())
-app.post('/rest/basket/:id/checkout', order())
+app.get('/rest/basket/:id', basket(authenticatedUsersPersistence))
+app.post('/rest/basket/:id/checkout', order(authenticatedUsersPersistence))
 app.put('/rest/basket/:id/coupon/:coupon', coupon())
 app.get('/rest/admin/application-version', appVersion())
 app.get('/rest/admin/application-configuration', appConfiguration())
@@ -256,13 +259,13 @@ app.get('/redirect', redirect())
 app.get('/rest/captcha', captcha())
 app.get('/rest/track-order/:id', trackOrder())
 app.get('/rest/country-mapping', countryMapping())
-app.get('/rest/saveLoginIp', saveLoginIp())
+app.get('/rest/saveLoginIp', saveLoginIp(authenticatedUsersPersistence))
 
 /* NoSQL API endpoints */
-app.get('/rest/product/:id/reviews', showProductReviews())
-app.put('/rest/product/:id/reviews', createProductReviews())
-app.patch('/rest/product/reviews', insecurity.isAuthorized(), updateProductReviews())
-app.post('/rest/product/reviews', insecurity.isAuthorized(), likeProductReviews())
+app.get('/rest/product/:id/reviews', showProductReviews(authenticatedUsersPersistence))
+app.put('/rest/product/:id/reviews', createProductReviews(authenticatedUsersPersistence))
+app.patch('/rest/product/reviews', insecurity.isAuthorized(), updateProductReviews(authenticatedUsersPersistence))
+app.post('/rest/product/reviews', insecurity.isAuthorized(), likeProductReviews(authenticatedUsersPersistence))
 
 /* B2B Order API */
 app.post('/b2b/v2/orders', b2bOrder())
@@ -272,8 +275,8 @@ app.get('/the/devs/are/so/funny/they/hid/an/easter/egg/within/the/easter/egg', e
 app.get('/this/page/is/hidden/behind/an/incredibly/high/paywall/that/could/only/be/unlocked/by/sending/1btc/to/us', premiumReward())
 
 /* Routes for profile page */
-app.get('/profile', userProfile())
-app.post('/profile', updateUserProfile())
+app.get('/profile', userProfile(authenticatedUsersPersistence))
+app.post('/profile', updateUserProfile(authenticatedUsersPersistence))
 
 app.use(angular())
 
