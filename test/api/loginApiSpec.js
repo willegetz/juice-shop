@@ -1,17 +1,22 @@
-const frisby = require('frisby')
-const Joi = frisby.Joi
-const insecurity = require('../../lib/insecurity')
-const config = require('config')
+'use strict';
 
-const API_URL = 'http://localhost:3000/api'
-const REST_URL = 'http://localhost:3000/rest'
+const frisby = require('frisby');
+const Joi = frisby.Joi;
+const config = require('config');
+
+const container = require('../../container');
+const insecurity = container.build('insecurityNew');
+
+const API_URL = 'http://localhost:3000/api';
+const REST_URL = 'http://localhost:3000/rest';
 
 const customHeader = {
   'X-User-Email': 'ciso@' + config.get('application.domain'),
   'Authorization': 'Bearer ' + insecurity.authorize(),
   'content-type': 'application/json'
-}
-const jsonHeader = { 'content-type': 'application/json' }
+};
+
+const jsonHeader = { 'content-type': 'application/json' };
 
 describe('/rest/user/login', () => {
   it('POST login newly created user', () => {
@@ -37,25 +42,25 @@ describe('/rest/user/login', () => {
             token: Joi.string(),
             umail: Joi.string(),
             bid: Joi.number()
-          })
-      })
-  })
+          });
+      });
+  });
 
   it('POST login non-existing user', () => {
     return frisby.post(REST_URL + '/user/login', {
       email: 'otto@mei.er',
       password: 'ooootto'
     }, { json: true })
-      .expect('status', 401)
-  })
+      .expect('status', 401);
+  });
 
   it('POST login without credentials', () => {
     return frisby.post(REST_URL + '/user/login', {
       email: undefined,
       password: undefined
     }, { json: true })
-      .expect('status', 401)
-  })
+      .expect('status', 401);
+  });
 
   it('POST login with admin credentials', () => {
     return frisby.post(REST_URL + '/user/login', {
@@ -69,8 +74,8 @@ describe('/rest/user/login', () => {
       .expect('header', 'content-type', /application\/json/)
       .expect('jsonTypes', 'authentication', {
         token: Joi.string()
-      })
-  })
+      });
+  });
 
   it('POST login with support-team credentials', () => {
     return frisby.post(REST_URL + '/user/login', {
@@ -84,8 +89,8 @@ describe('/rest/user/login', () => {
       .expect('header', 'content-type', /application\/json/)
       .expect('jsonTypes', 'authentication', {
         token: Joi.string()
-      })
-  })
+      });
+  });
 
   it('POST login with MC SafeSearch credentials', () => {
     return frisby.post(REST_URL + '/user/login', {
@@ -99,8 +104,8 @@ describe('/rest/user/login', () => {
       .expect('header', 'content-type', /application\/json/)
       .expect('jsonTypes', 'authentication', {
         token: Joi.string()
-      })
-  })
+      });
+  });
 
   it('POST login with Amy credentials', () => {
     return frisby.post(REST_URL + '/user/login', {
@@ -114,8 +119,8 @@ describe('/rest/user/login', () => {
       .expect('header', 'content-type', /application\/json/)
       .expect('jsonTypes', 'authentication', {
         token: Joi.string()
-      })
-  })
+      });
+  });
 
   it('POST login as bjoern.kimminich@googlemail.com with known password', () => {
     return frisby.post(REST_URL + '/user/login', {
@@ -129,8 +134,8 @@ describe('/rest/user/login', () => {
       .expect('header', 'content-type', /application\/json/)
       .expect('jsonTypes', 'authentication', {
         token: Joi.string()
-      })
-  })
+      });
+  });
 
   it('POST login with WHERE-clause disabling SQL injection attack', () => {
     return frisby.post(REST_URL + '/user/login', {
@@ -144,8 +149,8 @@ describe('/rest/user/login', () => {
       .expect('header', 'content-type', /application\/json/)
       .expect('jsonTypes', 'authentication', {
         token: Joi.string()
-      })
-  })
+      });
+  });
 
   it('POST login with known email "admin@juice-sh.op" in SQL injection attack', () => {
     return frisby.post(REST_URL + '/user/login', {
@@ -159,8 +164,8 @@ describe('/rest/user/login', () => {
       .expect('header', 'content-type', /application\/json/)
       .expect('jsonTypes', 'authentication', {
         token: Joi.string()
-      })
-  })
+      });
+  });
 
   it('POST login with known email "jim@juice-sh.op" in SQL injection attack', () => {
     return frisby.post(REST_URL + '/user/login', {
@@ -174,8 +179,8 @@ describe('/rest/user/login', () => {
       .expect('header', 'content-type', /application\/json/)
       .expect('jsonTypes', 'authentication', {
         token: Joi.string()
-      })
-  })
+      });
+  });
 
   it('POST login with known email "bender@juice-sh.op" in SQL injection attack', () => {
     return frisby.post(REST_URL + '/user/login', {
@@ -189,8 +194,8 @@ describe('/rest/user/login', () => {
       .expect('header', 'content-type', /application\/json/)
       .expect('jsonTypes', 'authentication', {
         token: Joi.string()
-      })
-  })
+      });
+  });
 
   it('POST login with query-breaking SQL Injection attack', () => {
     return frisby.post(REST_URL + '/user/login', {
@@ -200,8 +205,8 @@ describe('/rest/user/login', () => {
         password: undefined
       }
     })
-      .expect('status', 401)
-  })
+      .expect('status', 401);
+  });
 
   it('POST OAuth login as admin@juice-sh.op with "Remember me" exploit to log in as ciso@' + config.get('application.domain'), () => {
     return frisby.post(REST_URL + '/user/login', {
@@ -214,6 +219,6 @@ describe('/rest/user/login', () => {
     })
       .expect('status', 200)
       .expect('header', 'content-type', /application\/json/)
-      .expect('json', 'authentication', { umail: 'ciso@' + config.get('application.domain') })
-  })
-})
+      .expect('json', 'authentication', { umail: 'ciso@' + config.get('application.domain') });
+  });
+});
