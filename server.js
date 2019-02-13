@@ -2,6 +2,9 @@
 
 const container = require('./container');
 const authenticatedUsersPersistence = container.build('authenticatedUsersPersistence');
+const insecurity = container.build('insecurityNew');
+
+// const insecurity = require('./lib/insecurity');
 
 const path = require('path');
 const fs = require('fs-extra');
@@ -54,7 +57,6 @@ const createProductReviews = require('./routes/createProductReviews');
 const updateProductReviews = require('./routes/updateProductReviews');
 const likeProductReviews = require('./routes/likeProductReviews');
 const utils = require('./lib/utils');
-const insecurity = require('./lib/insecurity');
 const models = require('./models');
 const datacreator = require('./data/datacreator');
 const app = express();
