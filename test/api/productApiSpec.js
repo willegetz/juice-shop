@@ -1,21 +1,25 @@
-const frisby = require('frisby')
-const Joi = frisby.Joi
-const insecurity = require('../../lib/insecurity')
-const config = require('config')
+'use strict';
+
+const frisby = require('frisby');
+const Joi = frisby.Joi;
+const config = require('config');
+
+const container = require('../../container');
+const insecurity = container.build('insecurityNew');
 
 const tamperingProductId = ((() => {
-  const products = config.get('products')
+  const products = config.get('products');
   for (let i = 0; i < products.length; i++) {
     if (products[i].urlForProductTamperingChallenge) {
-      return i + 1
+      return i + 1;
     }
   }
-})())
+})());
 
-const API_URL = 'http://localhost:3000/api'
+const API_URL = 'http://localhost:3000/api';
 
-const authHeader = { 'Authorization': 'Bearer ' + insecurity.authorize(), 'content-type': 'application/json' }
-const jsonHeader = { 'content-type': 'application/json' }
+const authHeader = { 'Authorization': 'Bearer ' + insecurity.authorize(), 'content-type': 'application/json' };
+const jsonHeader = { 'content-type': 'application/json' };
 
 describe('/api/Products', () => {
   it('GET all products', () => {
@@ -28,8 +32,8 @@ describe('/api/Products', () => {
         description: Joi.string(),
         price: Joi.number(),
         image: Joi.string()
-      })
-  })
+      });
+  });
 
   it('POST new product is forbidden via public API', () => {
     return frisby.post(API_URL + '/Products', {
@@ -38,8 +42,8 @@ describe('/api/Products', () => {
       price: 0.99,
       image: 'dirt_juice.jpg'
     })
-      .expect('status', 401)
-  })
+      .expect('status', 401);
+  });
 
   it('POST new product does not filter XSS attacks', () => {
     return frisby.post(API_URL + '/Products', {
@@ -52,9 +56,9 @@ describe('/api/Products', () => {
       }
     })
       .expect('header', 'content-type', /application\/json/)
-      .expect('json', 'data', { description: '<iframe src="javascript:alert(`xss`)">' })
-  })
-})
+      .expect('json', 'data', { description: '<iframe src="javascript:alert(`xss`)">' });
+  });
+});
 
 describe('/api/Products/:id', () => {
   it('GET existing product by id', () => {
@@ -70,15 +74,15 @@ describe('/api/Products/:id', () => {
         createdAt: Joi.string(),
         updatedAt: Joi.string()
       })
-      .expect('json', 'data', { id: 1 })
-  })
+      .expect('json', 'data', { id: 1 });
+  });
 
   it('GET non-existing product by id', () => {
     return frisby.get(API_URL + '/Products/4711')
       .expect('status', 404)
       .expect('header', 'content-type', /application\/json/)
-      .expect('json', 'message', 'Not Found')
-  })
+      .expect('json', 'message', 'Not Found');
+  });
 
   it('PUT update existing product is possible due to Missing Function-Level Access Control vulnerability', () => {
     return frisby.put(API_URL + '/Products/' + tamperingProductId, {
@@ -89,8 +93,8 @@ describe('/api/Products/:id', () => {
     })
       .expect('status', 200)
       .expect('header', 'content-type', /application\/json/)
-      .expect('json', 'data', { description: '<a href="http://kimminich.de" target="_blank">More...</a>' })
-  })
+      .expect('json', 'data', { description: '<a href="http://kimminich.de" target="_blank">More...</a>' });
+  });
 
   it('PUT update existing product does not filter XSS attacks', () => {
     return frisby.put(API_URL + '/Products/1', {
@@ -101,16 +105,16 @@ describe('/api/Products/:id', () => {
     })
       .expect('status', 200)
       .expect('header', 'content-type', /application\/json/)
-      .expect('json', 'data', { description: '<script>alert(\'XSS\')</script>' })
-  })
+      .expect('json', 'data', { description: '<script>alert(\'XSS\')</script>' });
+  });
 
   it('DELETE existing product is forbidden via public API', () => {
     return frisby.del(API_URL + '/Products/1')
-      .expect('status', 401)
-  })
+      .expect('status', 401);
+  });
 
   it('DELETE existing product is forbidden via API even when authenticated', () => {
     return frisby.del(API_URL + '/Products/1', { headers: authHeader })
-      .expect('status', 401)
-  })
+      .expect('status', 401);
+  });
 })

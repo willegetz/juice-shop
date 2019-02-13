@@ -1,12 +1,16 @@
-const frisby = require('frisby')
-const Joi = frisby.Joi
-const insecurity = require('../../lib/insecurity')
-const config = require('config')
+'use strict';
 
-const API_URL = 'http://localhost:3000/api'
-const REST_URL = 'http://localhost:3000/rest'
+const frisby = require('frisby');
+const Joi = frisby.Joi;
+const config = require('config');
 
-const authHeader = { 'Authorization': 'Bearer ' + insecurity.authorize(), 'content-type': 'application/json' }
+const container = require('../../container');
+const insecurity = container.build('insecurityNew');
+
+const API_URL = 'http://localhost:3000/api';
+const REST_URL = 'http://localhost:3000/rest';
+
+const authHeader = { 'Authorization': 'Bearer ' + insecurity.authorize(), 'content-type': 'application/json' };
 
 describe('/api/SecurityQuestions', () => {
   it('GET all security questions ', () => {
@@ -16,8 +20,8 @@ describe('/api/SecurityQuestions', () => {
       .expect('jsonTypes', 'data.*', {
         id: Joi.number(),
         question: Joi.string()
-      })
-  })
+      });
+  });
 
   it('POST new security question is forbidden via public API even when authenticated', () => {
     return frisby.post(API_URL + '/SecurityQuestions', {
@@ -26,15 +30,15 @@ describe('/api/SecurityQuestions', () => {
         question: 'Your own first name?'
       }
     })
-      .expect('status', 401)
-  })
-})
+      .expect('status', 401);
+  });
+});
 
 describe('/api/SecurityQuestions/:id', () => {
   it('GET existing security question by id is forbidden via public API even when authenticated', () => {
     return frisby.get(API_URL + '/SecurityQuestions/1', { headers: authHeader })
-      .expect('status', 401)
-  })
+      .expect('status', 401);
+  });
 
   it('PUT update existing security question is forbidden via public API even when authenticated', () => {
     return frisby.put(API_URL + '/SecurityQuestions/1', {
@@ -43,14 +47,14 @@ describe('/api/SecurityQuestions/:id', () => {
         question: 'Your own first name?'
       }
     })
-      .expect('status', 401)
-  })
+      .expect('status', 401);
+  });
 
   it('DELETE existing security question is forbidden via public API even when authenticated', () => {
     return frisby.del(API_URL + '/SecurityQuestions/1', { headers: authHeader })
-      .expect('status', 401)
-  })
-})
+      .expect('status', 401);
+  });
+});
 
 describe('/rest/user/security-question', () => {
   it('GET security question for an existing user\'s email address', () => {
@@ -58,23 +62,23 @@ describe('/rest/user/security-question', () => {
       .expect('status', 200)
       .expect('json', 'question', {
         question: 'Your eldest siblings middle name?'
-      })
-  })
+      });
+  });
 
   it('GET security question returns nothing for an unknown email address', () => {
     return frisby.get(REST_URL + '/user/security-question?email=horst@unknown-us.er')
       .expect('status', 200)
-      .expect('json', {})
-  })
+      .expect('json', {});
+  });
 
   it('GET security question returns nothing for missing email address', () => {
     return frisby.get(REST_URL + '/user/security-question')
       .expect('status', 200)
-      .expect('json', {})
-  })
+      .expect('json', {});
+  });
 
   it('GET security question is not susceptible to SQL Injection attacks', () => {
     return frisby.get(REST_URL + '/user/security-question?email=\';')
-      .expect('status', 200)
-  })
-})
+      .expect('status', 200);
+  });
+});

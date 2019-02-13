@@ -1,12 +1,16 @@
-const frisby = require('frisby')
-const Joi = frisby.Joi
-const insecurity = require('../../lib/insecurity')
-const http = require('http')
-const config = require('config')
+'use strict';
 
-const REST_URL = 'http://localhost:3000/rest'
+const frisby = require('frisby');
+const Joi = frisby.Joi;
+const http = require('http');
+const config = require('config');
 
-const authHeader = { 'Authorization': 'Bearer ' + insecurity.authorize(), 'content-type': 'application/json' }
+const container = require('../../container');
+const insecurity = container.build('insecurityNew');
+
+const REST_URL = 'http://localhost:3000/rest';
+
+const authHeader = { 'Authorization': 'Bearer ' + insecurity.authorize(), 'content-type': 'application/json' };
 
 describe('/rest/product/:id/reviews', () => {
   const reviewResponseSchema = {
@@ -14,21 +18,21 @@ describe('/rest/product/:id/reviews', () => {
     product: Joi.number(),
     message: Joi.string(),
     author: Joi.string()
-  }
+  };
 
   it('GET product reviews by product id', () => {
     return frisby.get(REST_URL + '/product/1/reviews')
       .expect('status', 200)
       .expect('header', 'content-type', /application\/json/)
-      .expect('jsonTypes', reviewResponseSchema)
-  })
+      .expect('jsonTypes', reviewResponseSchema);
+  });
 
   it('GET product reviews attack by injecting a mongoDB sleep command', () => {
     return frisby.get(REST_URL + '/product/sleep(1)/reviews')
       .expect('status', 200)
       .expect('header', 'content-type', /application\/json/)
-      .expect('jsonTypes', reviewResponseSchema)
-  })
+      .expect('jsonTypes', reviewResponseSchema);
+  });
 
   it('PUT single product review can be created', () => {
     return frisby.put(REST_URL + '/product/1/reviews', {
@@ -38,34 +42,34 @@ describe('/rest/product/:id/reviews', () => {
       }
     })
       .expect('status', 201)
-      .expect('header', 'content-type', /application\/json/)
-  })
-})
+      .expect('header', 'content-type', /application\/json/);
+  });
+});
 
 describe('/rest/product/reviews', () => {
   const updatedReviewResponseSchema = {
     modified: Joi.number(),
     original: Joi.array(),
     updated: Joi.array()
-  }
+  };
 
-  let reviewId
+  let reviewId;
 
   beforeAll((done) => {
     http.get(REST_URL + '/product/1/reviews', (res) => {
-      let body = ''
+      let body = '';
 
       res.on('data', chunk => {
-        body += chunk
-      })
+        body += chunk;
+      });
 
       res.on('end', () => {
-        const response = JSON.parse(body)
-        reviewId = response.data[0]._id
-        done()
-      })
-    })
-  })
+        const response = JSON.parse(body);
+        reviewId = response.data[0]._id;
+        done();
+      });
+    });
+  });
 
   it('PATCH single product review can be edited', () => {
     return frisby.patch(REST_URL + '/product/reviews', {
@@ -77,8 +81,8 @@ describe('/rest/product/reviews', () => {
     })
       .expect('status', 200)
       .expect('header', 'content-type', /application\/json/)
-      .expect('jsonTypes', updatedReviewResponseSchema)
-  })
+      .expect('jsonTypes', updatedReviewResponseSchema);
+  });
 
   it('PATCH single product review editing need an authenticated user', () => {
     return frisby.patch(REST_URL + '/product/reviews', {
@@ -87,8 +91,8 @@ describe('/rest/product/reviews', () => {
         message: 'Lorem Ipsum'
       }
     })
-      .expect('status', 401)
-  })
+      .expect('status', 401);
+  });
 
   it('POST single product review can be liked', () => {
     return frisby.patch(REST_URL + '/product/reviews', {
@@ -97,12 +101,12 @@ describe('/rest/product/reviews', () => {
         id: reviewId
       }
     })
-      .expect('status', 200)
-  })
+      .expect('status', 200);
+  });
 
   it('PATCH multiple product review via injection', () => {
     // Count all the reviews. (Count starts at one because of the review inserted by the other tests...)
-    const totalReviews = config.get('products').reduce((sum, { reviews = [] }) => sum + reviews.length, 1)
+    const totalReviews = config.get('products').reduce((sum, { reviews = [] }) => sum + reviews.length, 1);
 
     return frisby.patch(REST_URL + '/product/reviews', {
       headers: authHeader,
@@ -114,6 +118,6 @@ describe('/rest/product/reviews', () => {
       .expect('status', 200)
       .expect('header', 'content-type', /application\/json/)
       .expect('jsonTypes', updatedReviewResponseSchema)
-      .expect('json', { modified: totalReviews })
-  })
-})
+      .expect('json', { modified: totalReviews });
+  });
+});

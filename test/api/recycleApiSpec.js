@@ -1,10 +1,14 @@
-const frisby = require('frisby')
-const Joi = frisby.Joi
-const insecurity = require('../../lib/insecurity')
+'use strict';
 
-const API_URL = 'http://localhost:3000/api'
+const frisby = require('frisby');
+const Joi = frisby.Joi;
 
-const authHeader = { 'Authorization': 'Bearer ' + insecurity.authorize(), 'content-type': 'application/json' }
+const container = require('../../container');
+const insecurity = container.build('insecurityNew');
+
+const API_URL = 'http://localhost:3000/api';
+
+const authHeader = { 'Authorization': 'Bearer ' + insecurity.authorize(), 'content-type': 'application/json' };
 
 describe('/api/Recycles', () => {
   it('POST new recycle', () => {
@@ -23,25 +27,25 @@ describe('/api/Recycles', () => {
         id: Joi.number(),
         createdAt: Joi.string(),
         updatedAt: Joi.string()
-      })
-  })
+      });
+  });
 
   it('GET all recycles is forbidden via public API', () => {
     return frisby.get(API_URL + '/Recycles')
-      .expect('status', 401)
-  })
+      .expect('status', 401);
+  });
 
   it('GET all recycles', () => {
     return frisby.get(API_URL + '/Recycles', { headers: authHeader })
-      .expect('status', 200)
-  })
-})
+      .expect('status', 200);
+  });
+});
 
 describe('/api/Recycles/:id', () => {
   it('GET existing recycle by id is forbidden', () => {
     return frisby.get(API_URL + '/Recycles/1', { headers: authHeader })
-      .expect('status', 401)
-  })
+      .expect('status', 401);
+  });
 
   it('PUT update existing recycle is forbidden', () => {
     return frisby.put(API_URL + '/Recycles/1', {
@@ -50,11 +54,11 @@ describe('/api/Recycles/:id', () => {
         quantity: 100000
       }
     })
-      .expect('status', 401)
-  })
+      .expect('status', 401);
+  });
 
   it('DELETE existing recycle is forbidden', () => {
     return frisby.del(API_URL + '/Recycles/1', { headers: authHeader })
-      .expect('status', 401)
-  })
-})
+      .expect('status', 401);
+  });
+});
